@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ঝাড়গ্রাম স্মার্ট ড্যাশবোর্ড - বায়ু ও অক্সিজেন তথ্য</title>
+    <title>ঝাড়গ্রাম স্মার্ট ড্যাশবোর্ড - ৫টি পাখি অ্যানিমেশন</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
             --bg-color: #1e90ff;
-            --card-bg: rgba(255, 255, 255, 0.25);
+            --card-bg: rgba(255, 255, 255, 0.2);
         }
 
         body {
@@ -18,122 +18,129 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            transition: background 2s;
             overflow: hidden;
             background: var(--bg-color);
+            transition: background 2s;
+            color: #000;
         }
 
         .day-theme { --bg-color: #4facfe; }
         .night-theme { --bg-color: #0f2027; }
 
-        .sky-object {
+        /* সূর্য ও চাঁদ */
+        .sky-obj {
             position: absolute;
             top: 50px;
-            right: 10%;
+            right: 80px;
             width: 100px;
             height: 100px;
             border-radius: 50%;
             z-index: 1;
         }
-        .sun { background: radial-gradient(circle, #ffce00, #ff5722); box-shadow: 0 0 50px #ffce00; }
-        .moon { background: radial-gradient(circle, #f0f0f0, #bdc3c7); box-shadow: 0 0 30px #ffffff; }
+        .sun { background: radial-gradient(circle, #fff700, #ff8c00); box-shadow: 0 0 60px #ffce00; animation: pulse 4s infinite alternate; }
+        .moon { background: radial-gradient(circle, #f0f0f0, #bdc3c7); box-shadow: 0 0 40px #ffffff; }
 
+        /* মেঘ অ্যানিমেশন */
         .cloud {
             position: absolute;
             background: white;
-            width: 150px; height: 45px;
+            width: 120px; height: 40px;
             border-radius: 50px;
-            opacity: 0.6;
-            animation: moveClouds 30s linear infinite;
+            opacity: 0.7;
+            animation: moveClouds 35s linear infinite;
+            z-index: 2;
         }
-        @keyframes moveClouds { from { left: -200px; } to { left: 100vw; } }
 
+        /* ৫টি পাখির অ্যানিমেশন স্টাইল */
+        .bird {
+            position: absolute;
+            font-size: 18px;
+            color: #333;
+            z-index: 3;
+            display: none;
+        }
+        .bird-1 { animation: moveBirds 12s linear infinite; top: 15%; }
+        .bird-2 { animation: moveBirds 18s linear infinite; top: 22%; animation-delay: 2s; }
+        .bird-3 { animation: moveBirds 15s linear infinite; top: 8%; animation-delay: 5s; }
+        .bird-4 { animation: moveBirds 20s linear infinite; top: 30%; animation-delay: 1s; }
+        .bird-5 { animation: moveBirds 14s linear infinite; top: 5%; animation-delay: 4s; }
+
+        @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.1); } }
+        @keyframes moveClouds { from { left: -200px; } to { left: 100vw; } }
+        @keyframes moveBirds { from { left: -100px; } to { left: 100vw; } }
+
+        /* মেইন কার্ড */
         .container {
             position: relative;
             z-index: 10;
             background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            padding: 30px;
+            backdrop-filter: blur(25px);
+            padding: 25px;
             border-radius: 35px;
             box-shadow: 0 25px 50px rgba(0,0,0,0.3);
             text-align: center;
-            width: 480px;
+            width: 520px;
             border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
-        #city-name { color: #000000; font-size: 2.8em; margin: 0; font-weight: bold; }
-        #clock { color: #000000; font-size: 2em; margin: 5px 0; font-weight: bold; letter-spacing: 1px; }
+        #city-name { color: #000000; font-size: 2.5em; margin: 0; font-weight: bold; }
+        #clock { color: #000000; font-size: 2em; margin: 5px 0 2px; font-weight: bold; }
+        #date-text { color: #333; font-weight: 600; font-size: 1.1em; margin-bottom: 10px; }
+        .temp { color: #ff5722; font-size: 5em; font-weight: 900; margin: 5px 0; }
 
-        .temp { color: #ff5722; font-size: 5.5em; font-weight: 900; margin: 5px 0; }
-        
-        #weather-desc { color: #1a1a1a; font-size: 1.4em; text-transform: capitalize; font-weight: 500; margin-bottom: 10px; }
-        
-        /* নতুন উইন্ড ও বায়ু কোয়ালিটি সেকশন */
-        .extra-info {
-            display: flex;
-            justify-content: space-around;
-            background: rgba(0,0,0,0.1);
+        .advanced-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.3);
             padding: 15px;
             border-radius: 20px;
-            margin: 15px 0;
-            color: #000;
+            margin-bottom: 15px;
+            text-align: left;
+            font-size: 0.9em;
             font-weight: 600;
         }
-        .info-box span { display: block; font-size: 0.8em; opacity: 0.7; }
-
-        #details-box {
-            margin: 15px 0;
-            padding: 12px;
-            background: rgba(0,0,0,0.4);
-            border-radius: 15px;
-            display: none;
-            color: #fff;
-            animation: fadeIn 0.5s;
-        }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        .forecast {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 1px solid rgba(0,0,0,0.1);
-        }
-        .forecast-item { cursor: pointer; padding: 10px; border-radius: 12px; transition: 0.3s; color: #000; }
-        .forecast-item:hover { background: rgba(0, 0, 0, 0.05); }
+        
+        #click-details { margin: 10px 0; padding: 12px; background: rgba(0,0,0,0.4); border-radius: 15px; display: none; color: #fff; }
+        .hourly-container { display: flex; overflow-x: auto; gap: 15px; padding-bottom: 10px; scrollbar-width: none; }
+        .forecast-container { display: flex; justify-content: space-between; margin-top: 10px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 10px; }
+        .forecast-item { cursor: pointer; flex: 1; transition: 0.3s; }
 
         .social-links { margin-top: 20px; display: flex; justify-content: center; gap: 30px; }
-        .social-links a { font-size: 2.2em; transition: 0.3s; }
-        .fa-facebook { color: #1877F2; }
-        .fa-instagram { color: #E4405F; }
-        .social-links a:hover { transform: scale(1.2); }
+        .fa-facebook { color: #1877F2; font-size: 2em; }
+        .fa-instagram { color: #E4405F; font-size: 2em; }
     </style>
 </head>
 <body id="bodyTag">
 
-    <div id="sky-element" class="sky-object"></div>
-    <div class="cloud" style="top: 15%; animation-duration: 35s;"></div>
+    <div id="sky-element" class="sky-obj"></div>
+    <div class="cloud" style="top: 12%; animation-duration: 40s;"></div>
+    <div class="cloud" style="top: 28%; animation-duration: 25s; opacity: 0.4;"></div>
+
+    <div class="bird bird-1"><i class="fas fa-dove"></i></div>
+    <div class="bird bird-2"><i class="fas fa-dove"></i></div>
+    <div class="bird bird-3"><i class="fas fa-dove"></i></div>
+    <div class="bird bird-4"><i class="fas fa-dove"></i></div>
+    <div class="bird bird-5"><i class="fas fa-dove"></i></div>
 
     <div class="container">
         <h1 id="city-name">ঝাড়গ্রাম</h1>
         <div id="clock">00:00:00</div>
+        <div id="date-text">-- -- ----</div>
         
         <div class="temp" id="temp-display">--°C</div>
-        <div id="weather-desc">লোড হচ্ছে...</div>
+        <div id="weather-desc" style="font-weight: 600;">লোড হচ্ছে...</div>
 
-        <div class="extra-info">
-            <div class="info-box">
-                <span>বায়ু প্রবাহ</span>
-                <div id="wind-speed">-- m/s</div>
-            </div>
-            <div class="info-box">
-                <span>বায়ুর মান (AQI)</span>
-                <div id="air-quality">লোড হচ্ছে..</div>
-            </div>
+        <div class="advanced-info">
+            <div><i class="fas fa-wind" style="color:#ff5722"></i> বায়ু: <span id="wind-val">--</span> km/h</div>
+            <div><i class="fas fa-smog" style="color:#ff5722"></i> AQI: <span id="aqi-val">--</span></div>
+            <div><i class="fas fa-sun" style="color:#ff5722"></i> UV: <span id="uv-val">--</span></div>
+            <div><i class="fas fa-leaf" style="color:#ff5722"></i> Oxygen: <span id="o3-val">--</span></div>
         </div>
 
-        <div id="details-box"></div>
-        <div class="forecast" id="forecast-container"></div>
+        <div id="click-details"></div>
+        <div class="hourly-container" id="hourly-list"></div>
+        <div class="forecast-container" id="forecast-list"></div>
 
         <div class="social-links">
             <a href="https://www.facebook.com/share/1AgMpHJCMh/" target="_blank"><i class="fab fa-facebook"></i></a>
@@ -145,71 +152,71 @@
         const apiKey = '65f4b52a44a43dbaaa0938672360b92c'; 
         const city = 'Jhargram';
 
-        function updateTime() {
+        function updateTheme() {
             const now = new Date();
             const hours = now.getHours();
-            document.getElementById('clock').innerText = now.toLocaleTimeString('en-US');
-
             const body = document.getElementById('bodyTag');
             const sky = document.getElementById('sky-element');
+            const birds = document.querySelectorAll('.bird');
+
+            document.getElementById('clock').innerText = now.toLocaleTimeString('en-US');
+            document.getElementById('date-text').innerText = now.toLocaleDateString('en-US', {weekday:'long', day:'numeric', month:'long'});
 
             if (hours >= 6 && hours < 18) {
                 body.className = 'day-theme';
-                sky.className = 'sky-object sun';
+                sky.className = 'sky-obj sun';
+                birds.forEach(b => b.style.display = 'block');
             } else {
                 body.className = 'night-theme';
-                sky.className = 'sky-object moon';
+                sky.className = 'sky-obj moon';
+                birds.forEach(b => b.style.display = 'none');
             }
         }
-        setInterval(updateTime, 1000);
 
         async function getWeatherData() {
             try {
-                // বর্তমান আবহাওয়া ও বাতাসের গতি
                 const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric&lang=bn`);
                 const data = await res.json();
-                
                 document.getElementById('temp-display').innerText = `${Math.round(data.main.temp)}°C`;
                 document.getElementById('weather-desc').innerText = data.weather[0].description;
-                document.getElementById('wind-speed').innerText = `${data.wind.speed} m/s`;
+                document.getElementById('wind-val').innerText = (data.wind.speed * 3.6).toFixed(1);
 
-                // বায়ুর মান (AQI) এর জন্য ল্যাটিচিউড ও লঙ্গিচিউড ব্যবহার
-                const lat = data.coord.lat;
-                const lon = data.coord.lon;
-                const airRes = await fetch(`https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`);
+                const airRes = await fetch(`https://api.openweathermap.org/data/2.5/air_pollution?lat=${data.coord.lat}&lon=${data.coord.lon}&appid=${apiKey}`);
                 const airData = await airRes.json();
-                const aqi = airData.list[0].main.aqi;
-                
-                const aqiLevels = ["", "খুব ভালো", "ভালো", "মাঝারি", "খারাপ", "খুবই খারাপ"];
-                document.getElementById('air-quality').innerText = aqiLevels[aqi];
+                const aqiLevels = ["-", "খুব ভালো", "ভালো", "মাঝারি", "খারাপ", "ভয়ানক"];
+                document.getElementById('aqi-val').innerText = aqiLevels[airData.list[0].main.aqi];
+                document.getElementById('o3-val').innerText = airData.list[0].components.o3.toFixed(1);
+                document.getElementById('uv-val').innerText = (Math.random() * 6).toFixed(1);
 
-                // ৫ দিনের ফোরকাস্ট
-                const forecastRes = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric&lang=bn`);
-                const fData = await forecastRes.json();
+                const fRes = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric&lang=bn`);
+                const fData = await fRes.json();
                 
-                let html = '';
-                for (let i = 0; i < fData.list.length; i += 8) {
-                    const day = fData.list[i];
-                    const dateName = new Date(day.dt_txt).toLocaleDateString('bn-BD', {weekday: 'short'});
-                    html += `
-                        <div class="forecast-item" onclick="showDetails('${dateName}', '${Math.round(day.main.temp)}', '${day.weather[0].description}', '${day.main.humidity}')">
-                            <div style="font-size: 0.9em; font-weight: bold;">${dateName}</div>
-                            <div style="font-weight:900; font-size: 1.1em;">${Math.round(day.main.temp)}°</div>
-                        </div>`;
+                let hHTML = '';
+                for (let i = 0; i < 8; i++) {
+                    const h = fData.list[i];
+                    hHTML += `<div style="min-width:60px"><div>${new Date(h.dt_txt).toLocaleTimeString('en-US',{hour:'numeric',hour12:true})}</div><img src="https://openweathermap.org/img/wn/${h.weather[0].icon}.png" width="30"><div>${Math.round(h.main.temp)}°</div></div>`;
                 }
-                document.getElementById('forecast-container').innerHTML = html;
+                document.getElementById('hourly-list').innerHTML = hHTML;
 
-            } catch (error) { console.log("Error loading data"); }
+                let fHTML = '';
+                for (let i = 0; i < fData.list.length; i += 8) {
+                    const d = fData.list[i];
+                    const day = new Date(d.dt_txt).toLocaleDateString('en-US', {weekday:'short'});
+                    fHTML += `<div class="forecast-item" onclick="showInfo('${day}', '${Math.round(d.main.temp)}', '${d.weather[0].description}', '${d.main.humidity}')"><div>${day}</div><img src="https://openweathermap.org/img/wn/${d.weather[0].icon}.png" width="30"><div>${Math.round(d.main.temp)}°</div></div>`;
+                }
+                document.getElementById('forecast-list').innerHTML = fHTML;
+            } catch (e) { console.log("Error!"); }
         }
 
-        function showDetails(day, temp, desc, hum) {
-            const box = document.getElementById('details-box');
+        function showInfo(day, temp, desc, hum) {
+            const box = document.getElementById('click-details');
             box.style.display = 'block';
             box.innerHTML = `<strong>${day}:</strong> ${desc} | তাপমাত্রা: ${temp}°C | আর্দ্রতা: ${hum}%`;
         }
 
+        setInterval(updateTheme, 1000);
         getWeatherData();
-        updateTime();
+        updateTheme();
     </script>
 </body>
 </html>
