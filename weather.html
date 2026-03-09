@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ঝাড়গ্রাম স্মার্ট ড্যাশবোর্ড - বায়ু ও অক্সিজেন তথ্য</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #1e90ff;
+            --card-bg: rgba(255, 255, 255, 0.25);
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            transition: background 2s;
+            overflow: hidden;
+            background: var(--bg-color);
+        }
+
+        .day-theme { --bg-color: #4facfe; }
+        .night-theme { --bg-color: #0f2027; }
+
+        .sky-object {
+            position: absolute;
+            top: 50px;
+            right: 10%;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            z-index: 1;
+        }
+        .sun { background: radial-gradient(circle, #ffce00, #ff5722); box-shadow: 0 0 50px #ffce00; }
+        .moon { background: radial-gradient(circle, #f0f0f0, #bdc3c7); box-shadow: 0 0 30px #ffffff; }
+
+        .cloud {
+            position: absolute;
+            background: white;
+            width: 150px; height: 45px;
+            border-radius: 50px;
+            opacity: 0.6;
+            animation: moveClouds 30s linear infinite;
+        }
+        @keyframes moveClouds { from { left: -200px; } to { left: 100vw; } }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            padding: 30px;
+            border-radius: 35px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            text-align: center;
+            width: 480px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        #city-name { color: #000000; font-size: 2.8em; margin: 0; font-weight: bold; }
+        #clock { color: #000000; font-size: 2em; margin: 5px 0; font-weight: bold; letter-spacing: 1px; }
+
+        .temp { color: #ff5722; font-size: 5.5em; font-weight: 900; margin: 5px 0; }
+        
+        #weather-desc { color: #1a1a1a; font-size: 1.4em; text-transform: capitalize; font-weight: 500; margin-bottom: 10px; }
+        
+        /* নতুন উইন্ড ও বায়ু কোয়ালিটি সেকশন */
+        .extra-info {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(0,0,0,0.1);
+            padding: 15px;
+            border-radius: 20px;
+            margin: 15px 0;
+            color: #000;
+            font-weight: 600;
+        }
+        .info-box span { display: block; font-size: 0.8em; opacity: 0.7; }
+
+        #details-box {
+            margin: 15px 0;
+            padding: 12px;
+            background: rgba(0,0,0,0.4);
+            border-radius: 15px;
+            display: none;
+            color: #fff;
+            animation: fadeIn 0.5s;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .forecast {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(0,0,0,0.1);
+        }
+        .forecast-item { cursor: pointer; padding: 10px; border-radius: 12px; transition: 0.3s; color: #000; }
+        .forecast-item:hover { background: rgba(0, 0, 0, 0.05); }
+
+        .social-links { margin-top: 20px; display: flex; justify-content: center; gap: 30px; }
+        .social-links a { font-size: 2.2em; transition: 0.3s; }
+        .fa-facebook { color: #1877F2; }
+        .fa-instagram { color: #E4405F; }
+        .social-links a:hover { transform: scale(1.2); }
+    </style>
+</head>
+<body id="bodyTag">
+
+    <div id="sky-element" class="sky-object"></div>
+    <div class="cloud" style="top: 15%; animation-duration: 35s;"></div>
+
+    <div class="container">
+        <h1 id="city-name">ঝাড়গ্রাম</h1>
+        <div id="clock">00:00:00</div>
+        
+        <div class="temp" id="temp-display">--°C</div>
+        <div id="weather-desc">লোড হচ্ছে...</div>
+
+        <div class="extra-info">
+            <div class="info-box">
+                <span>বায়ু প্রবাহ</span>
+                <div id="wind-speed">-- m/s</div>
+            </div>
+            <div class="info-box">
+                <span>বায়ুর মান (AQI)</span>
+                <div id="air-quality">লোড হচ্ছে..</div>
+            </div>
+        </div>
+
+        <div id="details-box"></div>
+        <div class="forecast" id="forecast-container"></div>
+
+        <div class="social-links">
+            <a href="https://www.facebook.com/share/1AgMpHJCMh/" target="_blank"><i class="fab fa-facebook"></i></a>
+            <a href="https://www.instagram.com/mt_boy_gopu?igsh=MXh4bDl0b2s3b3htYQ==" target="_blank"><i class="fab fa-instagram"></i></a>
+        </div>
+    </div>
+
+    <script>
+        const apiKey = '65f4b52a44a43dbaaa0938672360b92c'; 
+        const city = 'Jhargram';
+
+        function updateTime() {
+            const now = new Date();
+            const hours = now.getHours();
+            document.getElementById('clock').innerText = now.toLocaleTimeString('en-US');
+
+            const body = document.getElementById('bodyTag');
+            const sky = document.getElementById('sky-element');
+
+            if (hours >= 6 && hours < 18) {
+                body.className = 'day-theme';
+                sky.className = 'sky-object sun';
+            } else {
+                body.className = 'night-theme';
+                sky.className = 'sky-object moon';
+            }
+        }
+        setInterval(updateTime, 1000);
+
+        async function getWeatherData() {
+            try {
+                // বর্তমান আবহাওয়া ও বাতাসের গতি
+                const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric&lang=bn`);
+                const data = await res.json();
+                
+                document.getElementById('temp-display').innerText = `${Math.round(data.main.temp)}°C`;
+                document.getElementById('weather-desc').innerText = data.weather[0].description;
+                document.getElementById('wind-speed').innerText = `${data.wind.speed} m/s`;
+
+                // বায়ুর মান (AQI) এর জন্য ল্যাটিচিউড ও লঙ্গিচিউড ব্যবহার
+                const lat = data.coord.lat;
+                const lon = data.coord.lon;
+                const airRes = await fetch(`https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`);
+                const airData = await airRes.json();
+                const aqi = airData.list[0].main.aqi;
+                
+                const aqiLevels = ["", "খুব ভালো", "ভালো", "মাঝারি", "খারাপ", "খুবই খারাপ"];
+                document.getElementById('air-quality').innerText = aqiLevels[aqi];
+
+                // ৫ দিনের ফোরকাস্ট
+                const forecastRes = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric&lang=bn`);
+                const fData = await forecastRes.json();
+                
+                let html = '';
+                for (let i = 0; i < fData.list.length; i += 8) {
+                    const day = fData.list[i];
+                    const dateName = new Date(day.dt_txt).toLocaleDateString('bn-BD', {weekday: 'short'});
+                    html += `
+                        <div class="forecast-item" onclick="showDetails('${dateName}', '${Math.round(day.main.temp)}', '${day.weather[0].description}', '${day.main.humidity}')">
+                            <div style="font-size: 0.9em; font-weight: bold;">${dateName}</div>
+                            <div style="font-weight:900; font-size: 1.1em;">${Math.round(day.main.temp)}°</div>
+                        </div>`;
+                }
+                document.getElementById('forecast-container').innerHTML = html;
+
+            } catch (error) { console.log("Error loading data"); }
+        }
+
+        function showDetails(day, temp, desc, hum) {
+            const box = document.getElementById('details-box');
+            box.style.display = 'block';
+            box.innerHTML = `<strong>${day}:</strong> ${desc} | তাপমাত্রা: ${temp}°C | আর্দ্রতা: ${hum}%`;
+        }
+
+        getWeatherData();
+        updateTime();
+    </script>
+</body>
+</html>
